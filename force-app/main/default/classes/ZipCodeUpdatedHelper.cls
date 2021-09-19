@@ -1,5 +1,6 @@
 public without sharing class ZipCodeUpdatedHelper {
     public static void InitialCheck(List<Account> AccToWork, List<Account> OldAcc){
+        Boolean ZipUpdated = false;
         List<Territory__c> OwnersOk = new List<Territory__c>();
         for(Account AccInWork : AccToWork){
             List<Territory__c> OwnersToWork = [SELECT Name,OwnerId FROM Territory__c WHERE Name = :AccInWork.BillingPostalCode];
@@ -11,11 +12,11 @@ public without sharing class ZipCodeUpdatedHelper {
                 OwnersOk.add(OwnersToWork[0]);
             }
         }
-        Updater(OwnersOk, AccToWork, OldAcc);
+        Updater(OwnersOk, AccToWork, OldAcc, ZipUpdated);
     }
 
 
-    public static void Updater(List<Territory__c> ZipToWork, List<Account> AccToWork, List<Account> OldAcc) {
+    public static void Updater(List<Territory__c> ZipToWork, List<Account> AccToWork, List<Account> OldAcc, Boolean ZipUpdated) {
         List<Account> AccOk = new List<Account>();
         List<Contact> ContactOk = new List<Contact>();
         List<Opportunity> OppOk = new List<Opportunity>();
@@ -36,7 +37,10 @@ public without sharing class ZipCodeUpdatedHelper {
                 OppInWork.OwnerId = ZipToWork[counter].OwnerId;
                 OppOk.add(OppInWork);
             }
-            HistoryCreater(ZipToWork[counter], AccInWork, OldAcc[counter]);
+            if(ZipUpdated){
+                HistoryCreater(ZipToWork[counter], AccInWork, OldAcc[counter]);
+                update AccOk;
+            }
             counter++;
         }
         //update AccOk;
