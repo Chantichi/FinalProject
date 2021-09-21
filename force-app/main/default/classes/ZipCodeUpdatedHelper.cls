@@ -39,6 +39,7 @@ public without sharing class ZipCodeUpdatedHelper {
             }
             if(ZipUpdated){
                 HistoryCreater(ZipToWork[counter], AccInWork, OldAcc[counter]);
+                sendMail(AccInWork, OldAcc[counter]);
                 update AccOk;
             }
             counter++;
@@ -46,6 +47,30 @@ public without sharing class ZipCodeUpdatedHelper {
         //update AccOk;
         update ContactOk;
         update OppOk;
+    }
+
+
+    public static void sendMail(Account newAcc, Account oldAcc){
+        List<User> user1 = [SELECT Id, email FROM User WHERE Id = :newAcc.OwnerId];
+        List<User> user2 = [SELECT Id, email FROM User WHERE Id = :oldAcc.OwnerId];
+        EmailTemplate tpl = [SELECT Id, subject FROM EmailTemplate WHERE Name='Owner Changed'];
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setTemplateId(tpl.Id);
+        mail.setToAddresses(new List<String> {user1[0].email});
+        mail.setSubject(tpl.subject);
+        mail.setTargetObjectId(newAcc.OwnerId);
+        //mail.setWhatId(newAcc);
+        mail.setSaveAsActivity(false);
+        mail.setUseSignature(false);
+        Messaging.SingleEmailMessage mail2 = new Messaging.SingleEmailMessage();
+        mail2.setTemplateId(tpl.Id);
+        mail2.setToAddresses(new List<String> {user2[0].email});
+        mail2.setSubject(tpl.subject);
+        mail2.setTargetObjectId(oldAcc.OwnerId);
+        //mail2.setWhatId(newAcc);
+        mail2.setSaveAsActivity(false);
+        mail2.setUseSignature(false);
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail, mail2 });
     }
 
 
