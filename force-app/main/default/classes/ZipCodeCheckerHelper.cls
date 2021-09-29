@@ -1,4 +1,4 @@
-public with sharing class ZipCodeCheckerHelper {
+public without sharing class ZipCodeCheckerHelper {
     public static void Checker(List<Territory__c> TerritoriesToWork) {
         for(Territory__c TerritoryInWork : TerritoriesToWork){
             List<Territory__c> OldTerritories = [SELECT Name,OwnerId FROM Territory__c WHERE Name = :TerritoryInWork.Name];
@@ -10,13 +10,22 @@ public with sharing class ZipCodeCheckerHelper {
 
 
     public static void Updater(List<Territory__c> TerrToWork, List<Territory__c> OldTerr){
-        Boolean ZipUpdated = true;
-        List<Account> AccList = new List<Account>();
-        //List<Account> OldAccList = new List<Account>();
+        List<Account> AccListToUpdate = new List<Account>();
+        List<Account> AllAccounts = [SELECT Id, OwnerId, BillingPostalCode FROM Account];
         for(Integer i=0; i<TerrToWork.size(); i++){
-            List<Account> oneAcc = [SELECT Id, OwnerId, BillingPostalCode FROM Account WHERE BillingPostalCode = :TerrToWork[i].Name AND OwnerId = :OldTerr[i].OwnerId];
-            AccList.add(oneAcc[0]);
+            if(TerrToWork[i].OwnerId != OldTerr[i].OwnerId){
+                for(Account OneAccount : AllAccounts){
+                    if(oneAccount.BillingPostalCode == TerrToWork[i].Name && oneAccount.OwnerId == OldTerr[i].OwnerId){
+                        System.debug(oneAccount.OwnerId);
+                        System.debug(oneAccount.BillingPostalCode);
+                        System.debug(TerrToWork[i].OwnerId);
+                        System.debug(TerrToWork[i].Name);
+                        oneAccount.OwnerId = TerrToWork[i].OwnerId;
+                        AccListToUpdate.add(oneAccount);
+                    }
+                }
+            }
         }
-        ZipCodeUpdatedHelper.Updater(TerrToWork, AccList, AccList, ZipUpdated);
+        update AccListToUpdate;
     }
 }

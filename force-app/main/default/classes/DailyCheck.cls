@@ -52,6 +52,7 @@ public without sharing class DailyCheck implements Schedulable {
     }
 
     public void AccountChecker(){
+        List<Account> AccToUpdate = new List<Account>();
         for(Account acc : accs){
             Boolean ok = false;
             //System.debug('terrMap.keySet()');
@@ -77,15 +78,17 @@ public without sharing class DailyCheck implements Schedulable {
                 if(!ok){
                     if(possibleIds.size()>1){
                         AccountUpdater(possibleIds, acc);
+                        AccToUpdate.add(acc);
                     }else{
                         acc.OwnerId = possibleIds[0];
+                        AccToUpdate.add(acc);
                     }
-                    update acc;
                 }else{
                     possibleIds.clear();
                 }
             }
         }
+        update AccToUpdate;
     }
 
     public void AccountUpdater(List<Id> possibleIds, Account acc){
