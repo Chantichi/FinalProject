@@ -16,10 +16,6 @@ public without sharing class ZipCodeCheckerHelper {
             if(TerrToWork[i].OwnerId != OldTerr[i].OwnerId){
                 for(Account OneAccount : AllAccounts){
                     if(oneAccount.BillingPostalCode == TerrToWork[i].Name && oneAccount.OwnerId == OldTerr[i].OwnerId){
-                        System.debug(oneAccount.OwnerId);
-                        System.debug(oneAccount.BillingPostalCode);
-                        System.debug(TerrToWork[i].OwnerId);
-                        System.debug(TerrToWork[i].Name);
                         oneAccount.OwnerId = TerrToWork[i].OwnerId;
                         AccListToUpdate.add(oneAccount);
                     }

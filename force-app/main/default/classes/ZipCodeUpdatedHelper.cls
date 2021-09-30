@@ -1,7 +1,7 @@
 public without sharing class ZipCodeUpdatedHelper {
     public static void TriggerRun(List<Account> AccToWork, List<Account> OldAcc){
         for(Integer i=0; i<AccToWork.size(); i++){
-            if(AccToWork[i].BillingPostalCode != OldAcc[i].BillingPostalCode){
+            if(AccToWork[i].BillingPostalCode != OldAcc[i].BillingPostalCode || AccToWork[i].OwnerId != OldAcc[i].OwnerId){
                 InitialCheck(AccToWork, OldAcc);
             }
         }
@@ -79,7 +79,6 @@ public without sharing class ZipCodeUpdatedHelper {
 
 
     public static void sendMail(Account newAcc, Account oldAcc){
-        System.debug('sendMail started');
         List<User> user1 = [SELECT Id, email FROM User WHERE Id = :newAcc.OwnerId];
         List<User> user2 = [SELECT Id, email FROM User WHERE Id = :oldAcc.OwnerId];
         EmailTemplate tpl = [SELECT Id, subject FROM EmailTemplate WHERE Name='Owner Changed'];
@@ -98,7 +97,6 @@ public without sharing class ZipCodeUpdatedHelper {
         mail2.setSaveAsActivity(false);
         mail2.setUseSignature(false);
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail, mail2 });
-        System.debug('sendMail exited');
     }
 
 
@@ -114,6 +112,5 @@ public without sharing class ZipCodeUpdatedHelper {
             oneAH.Changed_By__c = userinfo.getUserId();
             insert oneAH;
         }
-        
     }
 }

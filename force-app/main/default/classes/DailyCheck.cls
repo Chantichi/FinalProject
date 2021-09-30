@@ -1,4 +1,5 @@
 public without sharing class DailyCheck implements Schedulable {
+    //todo
     List<Account> accs = [SELECT Id, BillingPostalCode, OwnerId FROM Account];
     List<Territory__c> territories = [SELECT Name, OwnerId FROM Territory__c ORDER BY Name];
     Map<String, List<Id>> terrMap = new Map<String, List<Id>>();
@@ -18,7 +19,6 @@ public without sharing class DailyCheck implements Schedulable {
                         owns.add(owner);
                     }
                     terrMap.put(territories[i-1].Name, owns);
-                    //System.debug(terrMap.get(territories[i-1].Name));
                     owners.clear();
                     owners.add(territories[i].OwnerId);
                 }else{
@@ -33,10 +33,8 @@ public without sharing class DailyCheck implements Schedulable {
                         owns.add(owner);
                     }
                     terrMap.put(territories[i-1].Name, owns);
-                    //System.debug(terrMap.get(territories[i-1].Name));
                     owners.clear();
                     terrMap.put(territories[i].Name, new List<Id> {territories[i].OwnerId});
-                    //System.debug(terrMap.get(territories[i].Name));
                 }else{
                     owners.add(territories[i].OwnerId);
                     List<Id> owns = new List<Id>();
@@ -44,7 +42,6 @@ public without sharing class DailyCheck implements Schedulable {
                         owns.add(owner);
                     }
                     terrMap.put(territories[i].Name, owns);
-                    //System.debug(terrMap.get(territories[i].Name));
                     owners.clear();
                 }
             }
@@ -55,37 +52,32 @@ public without sharing class DailyCheck implements Schedulable {
         List<Account> AccToUpdate = new List<Account>();
         for(Account acc : accs){
             Boolean ok = false;
-            //System.debug('terrMap.keySet()');
-            //System.debug(terrMap.keySet());
-            //System.debug('terrMap.values()');
-            //System.debug(terrMap.values());
-            //System.debug('terrMap.get(91000)');
-            //System.debug(terrMap.get('91000'));
+            List<Id> possibleIds = new List<Id>();
             for(String zipCode : terrMap.keySet()){
-                List<Id> possibleIds = new List<Id>();
-                if(terrMap.get(zipCode).size()>0){
+                //if(terrMap.get(zipCode).size()>0){
                     for(Id oneId : terrMap.get(zipCode)){
-                        if(acc.OwnerId == oneId){
-                            ok = true;
-                        }else{
-                            possibleIds.add(oneId);
+                        if(acc.BillingPostalCode == zipCode){
+                            if(acc.OwnerId == oneId){
+                                ok = true;
+                            }else{
+                                possibleIds.add(oneId);
+                            }
                         }
-                    } 
-                }else{
-                    ok = true;
-                }
-                
-                if(!ok){
-                    if(possibleIds.size()>1){
-                        AccountUpdater(possibleIds, acc);
-                        AccToUpdate.add(acc);
-                    }else{
-                        acc.OwnerId = possibleIds[0];
-                        AccToUpdate.add(acc);
                     }
+                //}else{
+                //    ok = true;
+                //}
+            }
+            if(!ok){
+                if(possibleIds.size()>1){
+                    AccountUpdater(possibleIds, acc);
+                    AccToUpdate.add(acc);
                 }else{
-                    possibleIds.clear();
+                    acc.OwnerId = possibleIds[0];
+                    AccToUpdate.add(acc);
                 }
+            }else{
+                possibleIds.clear();
             }
         }
         update AccToUpdate;
