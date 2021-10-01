@@ -10,7 +10,7 @@ public without sharing class ZipCodeUpdatedHelper {
     public static void InitialCheck(List<Account> AccToWork, List<Account> OldAcc){
         Boolean ZipUpdated = false;
         List<Territory__c> OwnersOk = new List<Territory__c>();
-        List<Territory__c> AllOwners = [SELECT Name, OwnerId FROM Territory__c];
+        List<Territory__c> AllOwners = [SELECT Name, OwnerId FROM Territory__c]; // add WHERE clause to filter also with zipcodes
         List<Territory__c> OwnersToWork = new List<Territory__c>();
         for(Integer i=0; i<AccToWork.size(); i++){
             for(Territory__c OneOwner : AllOwners){
@@ -46,7 +46,7 @@ public without sharing class ZipCodeUpdatedHelper {
 
     public static void ContactUpdater(Territory__c ZipToWork, Account AccToWork){
         List<Contact> ContactOk = new List<Contact>();
-        List<Contact> AllContactsToWork = [SELECT Id, AccountId FROM Contact];
+        List<Contact> AllContactsToWork = [SELECT Id, AccountId FROM Contact]; // filter also on AccountId
         List<Contact> ContactToWork = new List<Contact>();
         for(Contact OneContact : AllContactsToWork){
             if(OneContact.accountId == AccToWork.Id){
@@ -63,7 +63,7 @@ public without sharing class ZipCodeUpdatedHelper {
 
     public static void OpportunityUpdater(Territory__c ZipToWork, Account AccToWork){
         List<Opportunity> OppOk = new List<Opportunity>();
-        List<Opportunity> AllOppsToWork = [SELECT Id, AccountId FROM Opportunity WHERE IsClosed = False];
+        List<Opportunity> AllOppsToWork = [SELECT Id, AccountId FROM Opportunity WHERE IsClosed = False]; // filter also on AccountId
         List<Opportunity> OppToWork = new List<Opportunity>();
         for(Opportunity OneOpp : AllOppsToWork){
             if(OneOpp.AccountId == AccToWork.Id){
