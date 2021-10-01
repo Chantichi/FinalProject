@@ -11,7 +11,7 @@ public without sharing class ZipCodeCheckerHelper {
 
     public static void Updater(List<Territory__c> TerrToWork, List<Territory__c> OldTerr){
         List<Account> AccListToUpdate = new List<Account>();
-        List<Account> AllAccounts = [SELECT Id, OwnerId, BillingPostalCode FROM Account];
+        List<Account> AllAccounts = [SELECT Id, OwnerId, BillingPostalCode FROM Account]; // Use WHERE clause to limit number of records returned (use zipcode to filter)
         for(Integer i=0; i<TerrToWork.size(); i++){
             if(TerrToWork[i].OwnerId != OldTerr[i].OwnerId){
                 for(Account OneAccount : AllAccounts){
