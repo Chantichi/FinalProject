@@ -1,6 +1,6 @@
 public without sharing class DailyCheck implements Schedulable {
     //todo
-    List<Account> accs = [SELECT Id, BillingPostalCode, OwnerId FROM Account];
+    List<Account> accs = [SELECT Id, BillingPostalCode, OwnerId FROM Account WHERE SystemModStamp >= LAST_N_DAYS:1];
     List<Territory__c> territories = [SELECT Name, OwnerId FROM Territory__c ORDER BY Name];
     Map<String, List<Id>> terrMap = new Map<String, List<Id>>();
 
@@ -54,7 +54,6 @@ public without sharing class DailyCheck implements Schedulable {
             Boolean ok = false;
             List<Id> possibleIds = new List<Id>();
             for(String zipCode : terrMap.keySet()){
-                //if(terrMap.get(zipCode).size()>0){
                     for(Id oneId : terrMap.get(zipCode)){
                         if(acc.BillingPostalCode == zipCode){
                             if(acc.OwnerId == oneId){
@@ -64,15 +63,12 @@ public without sharing class DailyCheck implements Schedulable {
                             }
                         }
                     }
-                //}else{
-                //    ok = true;
-                //}
             }
             if(!ok){
                 if(possibleIds.size()>1){
                     AccountUpdater(possibleIds, acc);
                     AccToUpdate.add(acc);
-                }else{
+                }else if(possibleIds.size()==1){
                     acc.OwnerId = possibleIds[0];
                     AccToUpdate.add(acc);
                 }
